@@ -31,8 +31,9 @@ class Coordinate:
         When given original coordinates, returns the change in x and y
             (x2 - x1, y2 - y1)
     """
-    def getDeltaCoords(x1, y1):
-        return((__x_coordinate - x1, __y_coordinate - y1))
+    def getDeltaCoords(original_coordinate):
+
+        return(Coordinate(__x_coordinate - original_coordinate.getX(), __y_coordinate - original_coordinate.getY()))
     
     
     
