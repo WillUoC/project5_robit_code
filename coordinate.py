@@ -47,16 +47,21 @@ class Coordinate:
             Vectors stored as tuple (theta, magnitude)
     """
     def vector(self):
-        if self.__x_coordinate >= 0:
-            if self.__y_coordinate >= 0:
-                #Quadrant I
-                theta = math.atan(self.__y_coordinate/self.__x_coordinate)
-            else:
-                #Quadrant II
-                theta = 360 + math.atan(self.__y_coordinate/self.__x_coordinate)
-        else:
-            #Quadrant III & IV
-            theta = 180 + math.atan(self.__y_coordinate/self.__x_coordinate)
+        
+        theta = math.atan2(self.__y_coordinate, self.__x_coordinate)
+        
+
+#        if self.__x_coordinate >= 0:
+#            if self.__y_coordinate >= 0:
+#                #Quadrant I
+#                theta = math.atan(self.__y_coordinate/self.__x_coordinate)
+#            else:
+#                #Quadrant II
+#                theta = 360 + \
+#                    math.atan(self.__y_coordinate/self.__x_coordinate)
+#        else:
+#            #Quadrant III & IV
+#            theta = 180 + math.atan(self.__y_coordinate/self.__x_coordinate)
         
         magnitude = math.sqrt(self.__x_coordinate**2 + self.__y_coordinate**2)
 

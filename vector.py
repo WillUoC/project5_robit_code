@@ -43,7 +43,7 @@ class Vector:
         xCoord = self.__magnitude * math.cos(self.__theta)
         yCoord = self.__magnitude * math.sin(self.__theta)
         
-        return(coordinate(xCoord, yCoord))
+        return(coordinate.Coordinate(xCoord, yCoord))
 
     def __str__(self):
         return("({0:.2f}, {1:.2f})".format(self.__theta * 180/math.pi, self.__magnitude))

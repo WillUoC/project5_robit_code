@@ -20,11 +20,13 @@ brick.sound.beep()
 motor1 = Motor(Port.A)
 motor2 = Motor(Port.D)
 timmy = robit(motor1, motor2, Coordinate(0,0), math.pi/2)
-#timmy.calibrate()
-#wait(1000)
+timmy.calibrate()
+wait(1000)
 
 timmy.move(Coordinate(20, 20))
-wait(100000)
+wait(2000)
 
+timy.move(coordinate(-30, 45))
+wait(10000)
 
 

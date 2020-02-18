@@ -63,9 +63,9 @@ class robit:
             self.__runMotors()
             error = self.__getMotorError()
 
-            pidP = error
-            pidI += error * loop_time * self.__MAX_SPEED
-            pidD = (error - last_error) / (loop_time * self.__MAX_SPEED)
+            pidP = error / (loop_time/1000)
+            pidI += error / (loop_time/1000)**2
+            pidD = error - last_error
 
             correction = pidP * self.__PROPORTIONAL_CONSTANT + pidI * self.__INTEGRAL_CONSTANT + pidD * self.__DERIVATIVE_CONSTANT
            
@@ -99,7 +99,19 @@ class robit:
         this is only to pass a subtask
     """
     def reverse(self, coordinate):
-        return(None)
+        deltaCoords = coordinate.getDeltaCoords(self.__pos[-1])
+        deltaVector = deltaCoords.vector()
+
+        self.__printToScrn("Moving backwards by: {0}".format(deltaCoords))
+        self.__printToScrn("Vector: {0}".format(deltaVector))
+
+        self.__turntoangle(deltaVector.getTheta() - 180 if deltaVector.getTheta() >= 180 else deltaVector.getTheta() + 180)
+        brick.sound.beep()
+
+        self.__drive(-1 * (deltaVector.getMagnitude()))
+        brick.sound.beep()
+
+        self.__pos.append(coordinate)
   
     """
         Internal function to turn to specified angle
@@ -142,12 +154,13 @@ class robit:
                 
             #PID loop
 
-            self.__runMotors()
+            self.__runMotors(deltaMotorPos/math.fabs(deltaMotorPos))
+
             error = self.__getMotorError()
 
-            pidP = error
-            pidI += error * loop_time * self.__MAX_SPEED
-            pidD = (error - last_error) / (loop_time * self.__MAX_SPEED)
+            pidP = error / (loop_time/1000)
+            pidI += error / (loop_time/1000)**2
+            pidD = error - last_error
 
             correction = pidP * self.__PROPORTIONAL_CONSTANT + pidI * self.__INTEGRAL_CONSTANT + pidD * self.__DERIVATIVE_CONSTANT
            
@@ -177,10 +190,10 @@ class robit:
     """
         Run both motors with steer offset
     """
-    def __runMotors(self):
+    def __runMotors(self, sign):
         #self.__printToScrn("Steer Offset: {}".format(self.__steer_offset))
-        self.__left_motor.run(self.__MAX_SPEED - self.__steer_offset)
-        self.__right_motor.run(self.__MAX_SPEED + self.__steer_offset)
+        self.__left_motor.run(sign*(self.__MAX_SPEED - self.__steer_offset))
+        self.__right_motor.run(sign*(self.__MAX_SPEED + self.__steer_offset))
     
     """
         Stop running the motors
