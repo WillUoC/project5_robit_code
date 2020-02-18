@@ -23,11 +23,11 @@ class robit:
     __right_motor = None
     __current_angle = 0
 
-    __PROPORTIONAL_CONSTANT = 0.09
-    __INTEGRAL_CONSTANT = 0.0000003
-    __DERIVATIVE_CONSTANT = 650
+    __PROPORTIONAL_CONSTANT = 0.05
+    __INTEGRAL_CONSTANT = 0
+    __DERIVATIVE_CONSTANT = 0.05
 
-    __TURNING_SPEED = 50
+    __TURNING_SPEED = 100
 
 
     def __init__(self, left_motor, right_motor, starting_pos, starting_angle):
@@ -51,7 +51,7 @@ class robit:
         self.__left_motor.reset_angle(0)
         self.__right_motor.reset_angle(0)
 
-        self.__runMotors()
+        self.__runMotors(1)
         wait(2000)
         brick.sound.beep()
 
@@ -60,7 +60,7 @@ class robit:
             
             #PID loop
 
-            self.__runMotors()
+            self.__runMotors(1)
             error = self.__getMotorError()
 
             pidP = error / (loop_time/1000)
@@ -156,20 +156,21 @@ class robit:
 
             self.__runMotors(deltaMotorPos/math.fabs(deltaMotorPos))
 
-            error = self.__getMotorError()
-
-            pidP = error / (loop_time/1000)
-            pidI += error / (loop_time/1000)**2
-            pidD = error - last_error
-
-            correction = pidP * self.__PROPORTIONAL_CONSTANT + pidI * self.__INTEGRAL_CONSTANT + pidD * self.__DERIVATIVE_CONSTANT
-           
-            self.__offset_steer(correction)
-            self.__printToScrn("Correction: {}".format(correction))
-
-            wait(loop_time)
-           
-            last_error = error
+#            
+#            error = self.__getMotorError()
+#
+#            pidP = error / (loop_time/1000)
+#            pidI += error / (loop_time/1000)**2
+#            pidD = error - last_error
+#
+#            correction = pidP * self.__PROPORTIONAL_CONSTANT + pidI * self.__INTEGRAL_CONSTANT + pidD * self.__DERIVATIVE_CONSTANT
+#           
+#            self.__offset_steer(correction)
+#            self.__printToScrn("Correction: {}".format(correction))
+#
+#            wait(loop_time)
+#           
+#            last_error = error
 
         self.__stopMotors(True)
 
@@ -179,19 +180,20 @@ class robit:
     """
     def __offset_steer(self, offset_adder):
 
-        if self.__steer_offset + self.__MAX_SPEED + offset_adder < 0:
+        if self.__steer_offset + offset_adder < 0:
             self._steer_offset = -self.__MAX_SPEED
-        elif self.__steer_offset + self.__MAX_SPEED + offset_adder > 100:
+        elif self.__steer_offset + offset_adder > self.__MAX_SPEED:
             self.__steer_offset = self.__MAX_SPEED
         else:
             self.__steer_offset += offset_adder
-            
+        
+        self.__printToScrn("Steer Offset: {}".format(self.__steer_offset))
+
 
     """
         Run both motors with steer offset
     """
     def __runMotors(self, sign):
-        #self.__printToScrn("Steer Offset: {}".format(self.__steer_offset))
         self.__left_motor.run(sign*(self.__MAX_SPEED - self.__steer_offset))
         self.__right_motor.run(sign*(self.__MAX_SPEED + self.__steer_offset))
     

@@ -23,10 +23,10 @@ timmy = robit(motor1, motor2, Coordinate(0,0), math.pi/2)
 timmy.calibrate()
 wait(1000)
 
-timmy.move(Coordinate(20, 20))
+timmy.move(Coordinate(0, 20))
 wait(2000)
 
-timy.move(coordinate(-30, 45))
-wait(10000)
+timmy.move(Coordinate(0, 45))
+wait(2000)
 
-
+timmy.move(Coordinate(0, 10))
