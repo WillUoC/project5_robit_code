@@ -3,9 +3,10 @@ from pybricks import ev3brick as brick
 from pybricks.ev3devices import Motor
 from pybricks.parameters import Port, Stop
 from pybricks.tools import wait
+from sys import stderr
 
-from vector import Vector
-from coordinate import Coordinate
+from vecart.vector import Vector
+from vecart.coordinate import Coordinate
 
 class robit:
     """
@@ -23,18 +24,19 @@ class robit:
     __right_motor = None
     __current_angle = 0
 
-    __PROPORTIONAL_CONSTANT = 0.05
-    __INTEGRAL_CONSTANT = 0
-    __DERIVATIVE_CONSTANT = 0.05
+    __PROPORTIONAL_CONSTANT = 0.001
+    __INTEGRAL_CONSTANT = 0.00001
+    __DERIVATIVE_CONSTANT = 0.001
 
     __TURNING_SPEED = 100
 
 
-    def __init__(self, left_motor, right_motor, starting_pos, starting_angle):
+    def __init__(self, left_motor, right_motor, gyroscope, starting_pos, starting_angle):
         self.__left_motor = left_motor
         self.__right_motor = right_motor
         self.__pos.append(starting_pos)
         self.__current_angle = starting_angle
+        self.__gyroscope = gyroscope
 
     
     """
@@ -56,8 +58,9 @@ class robit:
         brick.sound.beep()
 
         loop_time = 100
+
+        loop_number = 0
         while math.fabs(correction) > 1:
-            
             #PID loop
 
             self.__runMotors(1)
@@ -68,19 +71,28 @@ class robit:
             pidD = error - last_error
 
             correction = pidP * self.__PROPORTIONAL_CONSTANT + pidI * self.__INTEGRAL_CONSTANT + pidD * self.__DERIVATIVE_CONSTANT
-           
             self.__offset_steer(correction)
-            self.__printToScrn("Correction: {}".format(correction))
+            
+            if loop_number % 10 == 0:
+                self.__clrScrn()
+                self.__printToScrn("P: {}".format(pidP * self.__PROPORTIONAL_CONSTANT))
+                self.__printToScrn("I: {}".format(pidI * self.__INTEGRAL_CONSTANT))
+                self.__printToScrn("D: {}".format(pidD * self.__DERIVATIVE_CONSTANT))
+                self.__printToScrn("Error: {}".format(error))
+                self.__printToScrn("Correction: {}".format(correction))
 
             wait(loop_time)
            
             last_error = error
-
+            
         brick.sound.beep()
+        self.__clrScrn()
         self.__printToScrn("Calibrated!")
         self.__stopMotors(True)
+   
+   
     """
-        Move to specified coordinates
+        Move robit to specified coordinates
     """
     def move(self, coordinate):
         deltaCoords = coordinate.getDeltaCoords(self.__pos[-1])
@@ -89,8 +101,10 @@ class robit:
         self.__printToScrn("Moving by: {0}".format(deltaCoords))
         self.__printToScrn("Vector: {0}".format(deltaVector))
         self.__turntoangle(deltaVector.getTheta())
+
         brick.sound.beep()
         self.__drive(deltaVector.getMagnitude())
+
         brick.sound.beep()
         self.__pos.append(coordinate)
     
@@ -118,6 +132,11 @@ class robit:
     """
     def __turntoangle(self, angle):
         deltaTheta = angle - self.__current_angle
+
+        self.__printToScrn("Initial Theta: {}".format(self.__current_angle))
+        self.__printToScrn("Target Theta: {}".format(angle))
+        self.__printToScrn("Delta Theta: {}".format(deltaTheta))
+
 
         self.__left_motor.reset_angle(0)
         self.__right_motor.reset_angle(0)
@@ -156,7 +175,6 @@ class robit:
 
             self.__runMotors(deltaMotorPos/math.fabs(deltaMotorPos))
 
-#            
 #            error = self.__getMotorError()
 #
 #            pidP = error / (loop_time/1000)
@@ -181,7 +199,7 @@ class robit:
     def __offset_steer(self, offset_adder):
 
         if self.__steer_offset + offset_adder < 0:
-            self._steer_offset = -self.__MAX_SPEED
+            self.__steer_offset = -self.__MAX_SPEED
         elif self.__steer_offset + offset_adder > self.__MAX_SPEED:
             self.__steer_offset = self.__MAX_SPEED
         else:
@@ -202,8 +220,8 @@ class robit:
             brake if true, else coast
     """
     def __stopMotors(self, brake):
-        self.__left_motor.stop(Stop.COAST) if brake == False else self.__left_motor.stop(Stop.BRAKE)
-        self.__right_motor.stop(Stop.COAST) if brake == False else self.__right_motor.stop(Stop.BRAKE)
+        self.__left_motor.stop(Stop.COAST) if brake == False else self.__left_motor.stop(Stop.HOLD)
+        self.__right_motor.stop(Stop.COAST) if brake == False else self.__right_motor.stop(Stop.HOLD)
 
     
     """
@@ -214,8 +232,14 @@ class robit:
         return(self.__left_motor.angle() - self.__right_motor.angle())
     
     def __printToScrn(self, text):
-        print(text)
-        #brick.display.text(text)
+        print(text, file=stderr)
+        brick.display.text(text)
     
     def __clrScrn(self):
         brick.display.clear()
+
+    def __getCurrentRotation(self):
+        return(self.__gyroscope.angle() * math.pi / 180)
+    
+    def __resetRotation(self, current_angle):
+        self.__gyroscope.reset_angle(current_angle)

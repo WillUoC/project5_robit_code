@@ -1,4 +1,4 @@
-import coordinate
+import vecart
 import math
 
 class Vector:
@@ -19,13 +19,13 @@ class Vector:
     """
     
     def getTheta(self):
-        return(int(self.__theta))
+        return(float(self.__theta))
     
     """
         Returns the magnitude of the vector
     """
     def getMagnitude(self):
-        return(int(self.__magnitude))
+        return(float(self.__magnitude))
 
     """
         Returns the whole vector in tuple form:
@@ -43,7 +43,7 @@ class Vector:
         xCoord = self.__magnitude * math.cos(self.__theta)
         yCoord = self.__magnitude * math.sin(self.__theta)
         
-        return(coordinate.Coordinate(xCoord, yCoord))
+        return(vecart.coordinate.Coordinate(xCoord, yCoord))
 
     def __str__(self):
         return("({0:.2f}, {1:.2f})".format(self.__theta * 180/math.pi, self.__magnitude))

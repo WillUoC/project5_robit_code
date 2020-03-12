@@ -8,10 +8,10 @@ from pybricks.parameters import (Port, Stop, Direction, Button, Color,
 from pybricks.tools import print, wait, StopWatch
 from pybricks.robotics import DriveBase
 
-from timmy import robit
+from robitcode.timmy import robit
 
-from coordinate import Coordinate
-from vector import Vector
+from vecart.coordinate import Coordinate
+from vecart.vector import Vector
 import math
 # Write your program here
 
@@ -21,12 +21,17 @@ motor1 = Motor(Port.A)
 motor2 = Motor(Port.D)
 timmy = robit(motor1, motor2, Coordinate(0,0), math.pi/2)
 timmy.calibrate()
+
+
 wait(1000)
 
-timmy.move(Coordinate(0, 20))
+brick.display.clear()
+timmy.move(Coordinate(0, 50))
 wait(2000)
 
+brick.display.clear()
 timmy.move(Coordinate(0, 45))
 wait(2000)
 
+brick.display.clear()
 timmy.move(Coordinate(0, 10))

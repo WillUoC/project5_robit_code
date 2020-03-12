@@ -1,4 +1,4 @@
-import vector
+import vecart
 import math
 
 class Coordinate:
@@ -65,7 +65,7 @@ class Coordinate:
         
         magnitude = math.sqrt(self.__x_coordinate**2 + self.__y_coordinate**2)
 
-        return(vector.Vector(theta, magnitude))
+        return(vecart.vector.Vector(theta, magnitude))
     
     def __str__(self):
         return("({0:.2f}, {1:.2f})".format(self.__x_coordinate, self.__y_coordinate))
